@@ -8,19 +8,22 @@ const DYNAMIC_CACHE = 'fitgrit-dynamic-v1';
 // Files to cache for offline use
 const STATIC_ASSETS = [
   '/',
-  '/index.php',
-  '/dashboard.php',
-  '/weight.php',
-  '/exercise.php',
-  '/food.php',
-  '/recipes.php',
+  '/offline.html',
   '/assets/css/style.css',
   '/assets/css/mobile.css',
+  '/assets/css/charts.css',
   '/assets/js/main.js',
   '/assets/js/charts.js',
   '/assets/js/pwa.js',
+  '/assets/js/validation.js',
   '/assets/images/logo.png',
+  '/assets/images/icons/icon-72x72.png',
+  '/assets/images/icons/icon-96x96.png',
+  '/assets/images/icons/icon-128x128.png',
+  '/assets/images/icons/icon-144x144.png',
+  '/assets/images/icons/icon-152x152.png',
   '/assets/images/icons/icon-192x192.png',
+  '/assets/images/icons/icon-384x384.png',
   '/assets/images/icons/icon-512x512.png',
   '/manifest.json'
 ];
@@ -28,7 +31,17 @@ const STATIC_ASSETS = [
 // URLs that should always fetch from network
 const NETWORK_FIRST_URLS = [
   '/api/',
-  '/logout.php'
+  '/logout.php',
+  '/includes/',
+  '/login',
+  '/register'
+];
+
+// URLs that should never be cached (always fetch fresh)
+const NEVER_CACHE_URLS = [
+  '/logout.php',
+  '/api/',
+  '/includes/'
 ];
 
 // Install event - cache static assets
@@ -83,6 +96,17 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+  // Skip non-GET requests for caching
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // Never cache certain URLs
+  if (NEVER_CACHE_URLS.some(url => requestUrl.pathname.startsWith(url))) {
+    event.respondWith(fetch(event.request, { redirect: 'follow' }));
+    return;
+  }
+  
   // Network first for API calls and dynamic content
   if (NETWORK_FIRST_URLS.some(url => requestUrl.pathname.startsWith(url))) {
     event.respondWith(networkFirst(event.request));
@@ -96,16 +120,60 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // Stale while revalidate for pages
-  if (event.request.method === 'GET' && 
-      (requestUrl.pathname.endsWith('.php') || requestUrl.pathname === '/')) {
-    event.respondWith(staleWhileRevalidate(event.request));
+  // Special handling for PHP pages that might redirect
+  if (requestUrl.pathname.endsWith('.php') || requestUrl.pathname === '/') {
+    event.respondWith(handlePageRequest(event.request));
     return;
   }
   
   // Default to network
-  event.respondWith(fetch(event.request));
+  event.respondWith(fetch(event.request, { redirect: 'follow' }));
 });
+
+// Handle page requests with potential redirects
+async function handlePageRequest(request) {
+  try {
+    const networkResponse = await fetch(request, {
+      redirect: 'follow'
+    });
+    
+    // If it's a redirect (3xx status), don't cache and just return
+    if (networkResponse.status >= 300 && networkResponse.status < 400) {
+      return networkResponse;
+    }
+    
+    // Only cache successful, non-redirected responses
+    if (networkResponse.ok && 
+        networkResponse.type === 'basic' && 
+        networkResponse.url === request.url) {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.log('FitGrit Service Worker: Page request failed, trying cache');
+    
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // For navigation requests, try to return the login page
+    if (request.mode === 'navigate') {
+      const loginPage = await caches.match('/');
+      if (loginPage) {
+        return loginPage;
+      }
+    }
+    
+    return new Response('Offline - Please check your connection', {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  }
+}
 
 // Cache first strategy
 async function cacheFirst(request) {
@@ -115,8 +183,11 @@ async function cacheFirst(request) {
       return cachedResponse;
     }
     
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
+    const networkResponse = await fetch(request, {
+      redirect: 'follow'
+    });
+    
+    if (networkResponse.ok && networkResponse.type === 'basic') {
       const cache = await caches.open(STATIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
@@ -134,9 +205,15 @@ async function cacheFirst(request) {
 // Network first strategy
 async function networkFirst(request) {
   try {
-    const networkResponse = await fetch(request);
+    const networkResponse = await fetch(request, {
+      redirect: 'follow'
+    });
     
-    if (networkResponse.ok && request.method === 'GET') {
+    // Only cache successful non-redirected responses
+    if (networkResponse.ok && 
+        networkResponse.type === 'basic' && 
+        networkResponse.status < 300 &&
+        request.method === 'GET') {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
@@ -171,12 +248,23 @@ async function staleWhileRevalidate(request) {
   const cache = await caches.open(DYNAMIC_CACHE);
   const cachedResponse = await cache.match(request);
   
-  const fetchPromise = fetch(request).then(networkResponse => {
-    if (networkResponse.ok) {
+  const fetchPromise = fetch(request, {
+    redirect: 'follow'
+  }).then(networkResponse => {
+    // Only cache successful, non-redirected responses
+    if (networkResponse.ok && 
+        networkResponse.type === 'basic' && 
+        networkResponse.status < 300) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-  }).catch(() => cachedResponse);
+  }).catch(error => {
+    console.log('FitGrit Service Worker: Network failed for', request.url);
+    return cachedResponse || new Response('Offline', {
+      status: 503,
+      statusText: 'Service Unavailable'
+    });
+  });
   
   return cachedResponse || fetchPromise;
 }

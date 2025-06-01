@@ -146,28 +146,39 @@ $activityCounts = [
 .nav {
     display: flex;
     list-style: none;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
     margin: 0;
     padding: 0;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .nav-item {
     position: relative;
+    flex-shrink: 0;
 }
 
 .nav-link {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--radius-md);
     text-decoration: none;
     color: var(--text-light);
     font-weight: 500;
     transition: all var(--transition-normal);
     position: relative;
-    min-height: 44px; /* Touch-friendly */
+    min-height: 40px;
     white-space: nowrap;
+    font-size: 0.9rem;
 }
 
 .nav-link:hover {
@@ -188,28 +199,30 @@ $activityCounts = [
 }
 
 .nav-icon {
-    font-size: 1.2rem;
-    min-width: 24px;
+    font-size: 1.1rem;
+    min-width: 20px;
     text-align: center;
 }
 
 .nav-text {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    display: block;
 }
 
 .nav-badge {
     background: var(--accent-red);
     color: var(--white);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    height: 18px;
+    padding: 1px 4px;
+    border-radius: 8px;
+    min-width: 16px;
+    height: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
+    margin-left: var(--spacing-xs);
+    line-height: 1;
 }
 
 .nav-link.active .nav-badge {
@@ -222,8 +235,8 @@ $activityCounts = [
     bottom: -2px;
     left: 50%;
     transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     background: var(--white);
     border-radius: 50%;
 }
@@ -284,6 +297,30 @@ $activityCounts = [
     opacity: 0.7;
 }
 
+/* Tablet adjustments */
+@media (max-width: 1024px) {
+    .nav-text {
+        display: none;
+    }
+    
+    .nav-link {
+        padding: var(--spacing-xs);
+        min-width: 40px;
+        justify-content: center;
+    }
+    
+    .nav-icon {
+        font-size: 1.2rem;
+    }
+    
+    .nav-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        margin-left: 0;
+    }
+}
+
 /* Mobile Navigation Styles */
 @media (max-width: 768px) {
     .header .nav {
@@ -294,6 +331,11 @@ $activityCounts = [
         flex-direction: column;
         gap: var(--spacing-md);
         padding: var(--spacing-lg) 0;
+        overflow-x: visible;
+    }
+    
+    .mobile-nav .nav-item {
+        width: 100%;
     }
     
     .mobile-nav .nav-link {
@@ -301,6 +343,8 @@ $activityCounts = [
         border-radius: var(--radius-lg);
         font-size: 1.1rem;
         justify-content: flex-start;
+        width: 100%;
+        min-height: 50px;
     }
     
     .mobile-nav .nav-icon {
@@ -310,10 +354,33 @@ $activityCounts = [
     
     .mobile-nav .nav-text {
         font-size: 1.1rem;
+        display: block;
+    }
+    
+    .mobile-nav .nav-badge {
+        position: static;
+        margin-left: auto;
     }
     
     .keyboard-shortcuts-hint {
         display: none !important;
+    }
+}
+
+/* Small tablet specific */
+@media (max-width: 900px) and (min-width: 769px) {
+    .nav {
+        gap: 2px;
+    }
+    
+    .nav-link {
+        padding: 6px 8px;
+        font-size: 0.85rem;
+    }
+    
+    .nav-icon {
+        font-size: 1rem;
+        min-width: 18px;
     }
 }
 
@@ -361,11 +428,50 @@ $activityCounts = [
 .nav-link[data-preload="true"]:hover::after {
     transform: translateX(100%);
 }
+
+/* Scroll fade indicators for horizontal scroll */
+.nav-container {
+    position: relative;
+}
+
+.nav-container::before,
+.nav-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-container::before {
+    left: 0;
+    background: linear-gradient(to right, var(--darker-grey), transparent);
+}
+
+.nav-container::after {
+    right: 0;
+    background: linear-gradient(to left, var(--darker-grey), transparent);
+}
+
+.nav-container.scroll-left::before {
+    opacity: 1;
+}
+
+.nav-container.scroll-right::after {
+    opacity: 1;
+}
 </style>
 
 <script>
 // Navigation JavaScript functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize navigation scroll handling
+    initializeNavScroll();
+    
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         if (e.altKey && !e.ctrlKey && !e.shiftKey) {
@@ -415,6 +521,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update badges every 30 seconds
     setInterval(updateActivityBadges, 30000);
 });
+
+function initializeNavScroll() {
+    const navContainer = document.getElementById('navContainer');
+    const nav = navContainer ? navContainer.querySelector('.nav') : null;
+    
+    if (!nav || !navContainer) return;
+    
+    function updateScrollIndicators() {
+        const isScrollable = nav.scrollWidth > nav.clientWidth;
+        const isAtStart = nav.scrollLeft <= 5;
+        const isAtEnd = nav.scrollLeft >= nav.scrollWidth - nav.clientWidth - 5;
+        
+        navContainer.classList.toggle('scroll-left', isScrollable && !isAtStart);
+        navContainer.classList.toggle('scroll-right', isScrollable && !isAtEnd);
+    }
+    
+    // Update indicators on scroll
+    nav.addEventListener('scroll', updateScrollIndicators);
+    
+    // Update indicators on resize
+    window.addEventListener('resize', updateScrollIndicators);
+    
+    // Initial check
+    setTimeout(updateScrollIndicators, 100);
+}
 
 function showKeyboardHint() {
     const hint = document.getElementById('keyboardHint');

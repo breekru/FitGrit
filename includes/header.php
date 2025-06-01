@@ -95,7 +95,9 @@ if (isset($_SESSION['offline_data_count']) && $_SESSION['offline_data_count'] > 
             
             <!-- Desktop Navigation -->
             <nav class="header-nav">
-                <?php include 'navigation.php'; ?>
+                <div class="nav-container" id="navContainer">
+                    <?php include 'navigation.php'; ?>
+                </div>
             </nav>
             
             <!-- Header Right - User Menu -->

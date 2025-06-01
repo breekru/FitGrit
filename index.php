@@ -312,6 +312,31 @@ $csrfToken = generateCSRFToken();
             }
         }
         
+        // PWA Install prompt functions
+        function installPWA() {
+            if (typeof fitgritPWA !== 'undefined' && fitgritPWA.installPWA) {
+                fitgritPWA.installPWA();
+            } else {
+                console.log('PWA installation not available');
+                dismissInstallPrompt();
+            }
+        }
+        
+        function dismissInstallPrompt() {
+            const installPrompt = document.getElementById('installPrompt');
+            if (installPrompt) {
+                installPrompt.classList.remove('show');
+                installPrompt.style.display = 'none';
+            }
+            
+            // Store dismissal in localStorage
+            localStorage.setItem('fitgrit_install_prompt_dismissed', 'true');
+            
+            if (typeof fitgritPWA !== 'undefined' && fitgritPWA.dismissInstallPrompt) {
+                fitgritPWA.dismissInstallPrompt();
+            }
+        }
+        
         // Form submission handling
         document.addEventListener('DOMContentLoaded', function() {
             const forms = document.querySelectorAll('form');
@@ -345,6 +370,25 @@ $csrfToken = generateCSRFToken();
                 
                 password.addEventListener('input', validatePasswords);
                 confirmPassword.addEventListener('input', validatePasswords);
+            }
+            
+            // Check if install prompt was previously dismissed
+            const dismissed = localStorage.getItem('fitgrit_install_prompt_dismissed');
+            if (dismissed === 'true') {
+                const installPrompt = document.getElementById('installPrompt');
+                if (installPrompt) {
+                    installPrompt.style.display = 'none';
+                }
+            }
+            
+            // Close install prompt when clicking outside
+            const installPrompt = document.getElementById('installPrompt');
+            if (installPrompt) {
+                installPrompt.addEventListener('click', function(e) {
+                    if (e.target === installPrompt) {
+                        dismissInstallPrompt();
+                    }
+                });
             }
         });
     </script>
@@ -454,32 +498,89 @@ $csrfToken = generateCSRFToken();
             font-weight: 500;
         }
         
+        /* Fixed PWA install prompt styles */
         .install-prompt {
+            position: fixed;
+            bottom: var(--spacing-md);
+            left: var(--spacing-md);
+            right: var(--spacing-md);
             background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: var(--white);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 20px var(--shadow);
+            display: none;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .install-prompt.show {
+            display: block;
         }
         
         .install-content {
-            flex: 1;
+            margin-bottom: var(--spacing-md);
         }
         
         .install-content strong {
             display: block;
             margin-bottom: var(--spacing-xs);
+            font-size: 1.1rem;
         }
         
         .install-content p {
             margin: 0;
             font-size: 0.9rem;
             opacity: 0.9;
+            line-height: 1.4;
         }
         
         .install-actions {
             display: flex;
             gap: var(--spacing-sm);
-            margin-top: var(--spacing-sm);
+            justify-content: flex-end;
+        }
+        
+        .install-actions .btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: none;
+            font-weight: 500;
+        }
+        
+        .install-actions .btn-outline {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .install-actions .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .install-actions .btn-primary {
+            background: var(--white);
+            color: var(--primary-orange);
+        }
+        
+        .install-actions .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+        }
+        
+        @keyframes slideUp {
+            from { 
+                transform: translateY(100%); 
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
         }
         
         @media (max-width: 768px) {
@@ -505,13 +606,19 @@ $csrfToken = generateCSRFToken();
             }
             
             .install-prompt {
-                flex-direction: column;
-                text-align: center;
+                left: var(--spacing-sm);
+                right: var(--spacing-sm);
+                bottom: var(--spacing-sm);
             }
             
             .install-actions {
-                justify-content: center;
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+            
+            .install-actions .btn {
                 width: 100%;
+                justify-content: center;
             }
         }
     </style>

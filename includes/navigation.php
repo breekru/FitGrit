@@ -142,22 +142,16 @@ $activityCounts = [
 </div>
 
 <style>
-/* Navigation Styles */
+/* Compact Navigation Styles */
 .nav {
     display: flex;
     list-style: none;
-    gap: var(--spacing-xs);
+    gap: 4px;
     margin: 0;
     padding: 0;
     align-items: center;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-}
-
-.nav::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+    justify-content: center;
 }
 
 .nav-item {
@@ -168,17 +162,17 @@ $activityCounts = [
 .nav-link {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-md);
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
     text-decoration: none;
     color: var(--text-light);
     font-weight: 500;
     transition: all var(--transition-normal);
     position: relative;
-    min-height: 40px;
+    min-height: 36px;
     white-space: nowrap;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .nav-link:hover {
@@ -199,29 +193,29 @@ $activityCounts = [
 }
 
 .nav-icon {
-    font-size: 1.1rem;
-    min-width: 20px;
+    font-size: 1rem;
+    min-width: 16px;
     text-align: center;
 }
 
 .nav-text {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: block;
 }
 
 .nav-badge {
     background: var(--accent-red);
     color: var(--white);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     padding: 1px 4px;
-    border-radius: 8px;
-    min-width: 16px;
-    height: 16px;
+    border-radius: 6px;
+    min-width: 14px;
+    height: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: var(--spacing-xs);
+    margin-left: 4px;
     line-height: 1;
 }
 
@@ -297,27 +291,60 @@ $activityCounts = [
     opacity: 0.7;
 }
 
-/* Tablet adjustments */
+/* Medium screens - hide text on smaller items */
+@media (max-width: 1200px) {
+    .nav {
+        gap: 2px;
+    }
+    
+    .nav-link {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .nav-text {
+        font-size: 0.8rem;
+    }
+}
+
+/* Tablet - icons only */
 @media (max-width: 1024px) {
     .nav-text {
         display: none;
     }
     
     .nav-link {
-        padding: var(--spacing-xs);
-        min-width: 40px;
+        padding: 8px;
+        min-width: 36px;
         justify-content: center;
     }
     
     .nav-icon {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+        min-width: 20px;
     }
     
     .nav-badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
+        top: -2px;
+        right: -2px;
         margin-left: 0;
+    }
+}
+
+/* Small tablet */
+@media (max-width: 900px) {
+    .nav {
+        gap: 1px;
+    }
+    
+    .nav-link {
+        padding: 6px;
+        min-width: 32px;
+    }
+    
+    .nav-icon {
+        font-size: 1rem;
     }
 }
 
@@ -331,7 +358,7 @@ $activityCounts = [
         flex-direction: column;
         gap: var(--spacing-md);
         padding: var(--spacing-lg) 0;
-        overflow-x: visible;
+        justify-content: flex-start;
     }
     
     .mobile-nav .nav-item {
@@ -364,23 +391,6 @@ $activityCounts = [
     
     .keyboard-shortcuts-hint {
         display: none !important;
-    }
-}
-
-/* Small tablet specific */
-@media (max-width: 900px) and (min-width: 769px) {
-    .nav {
-        gap: 2px;
-    }
-    
-    .nav-link {
-        padding: 6px 8px;
-        font-size: 0.85rem;
-    }
-    
-    .nav-icon {
-        font-size: 1rem;
-        min-width: 18px;
     }
 }
 
@@ -427,42 +437,6 @@ $activityCounts = [
 
 .nav-link[data-preload="true"]:hover::after {
     transform: translateX(100%);
-}
-
-/* Scroll fade indicators for horizontal scroll */
-.nav-container {
-    position: relative;
-}
-
-.nav-container::before,
-.nav-container::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 20px;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.nav-container::before {
-    left: 0;
-    background: linear-gradient(to right, var(--darker-grey), transparent);
-}
-
-.nav-container::after {
-    right: 0;
-    background: linear-gradient(to left, var(--darker-grey), transparent);
-}
-
-.nav-container.scroll-left::before {
-    opacity: 1;
-}
-
-.nav-container.scroll-right::after {
-    opacity: 1;
 }
 </style>
 

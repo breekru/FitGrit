@@ -78,119 +78,180 @@ if (isset($_SESSION['offline_data_count']) && $_SESSION['offline_data_count'] > 
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <div class="header-left">
-                <!-- Logo -->
-                <div class="logo">
-                    <img src="assets/images/logo.png" alt="FitGrit Logo" width="40" height="40">
-                    <span>FitGrit</span>
-                </div>
-                
-                <!-- Mobile Menu Toggle -->
-                <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation">
-                    <span class="hamburger"></span>
-                    <span class="hamburger"></span>
-                    <span class="hamburger"></span>
-                </button>
-            </div>
-            
-            <!-- Desktop Navigation -->
-            <nav class="header-nav">
-                <div class="nav-container" id="navContainer">
-                    <?php include 'navigation.php'; ?>
-                </div>
-            </nav>
-            
-            <!-- Header Right - User Menu -->
-            <div class="header-right">
-                <!-- Quick Add Button -->
-                <div class="quick-add-dropdown">
-                    <button class="btn btn-primary btn-small quick-add-toggle" id="quickAddToggle" title="Quick Add">
-                        <span class="plus-icon">+</span>
-                        <span class="btn-text d-none d-md-inline">Add</span>
-                    </button>
-                    
-                    <div class="quick-add-menu" id="quickAddMenu">
-                        <a href="weight.php?quick=true" class="quick-add-item">
-                            <span class="item-icon">⚖️</span>
-                            <span>Log Weight</span>
-                        </a>
-                        <a href="exercise.php?quick=true" class="quick-add-item">
-                            <span class="item-icon">💪</span>
-                            <span>Log Exercise</span>
-                        </a>
-                        <a href="food.php?quick=true" class="quick-add-item">
-                            <span class="item-icon">🍎</span>
-                            <span>Log Food</span>
-                        </a>
-                        <a href="recipes.php?add=true" class="quick-add-item">
-                            <span class="item-icon">📝</span>
-                            <span>Add Recipe</span>
-                        </a>
+            <div class="header-content">
+                <div class="header-left">
+                    <!-- Logo -->
+                    <div class="logo">
+                        <img src="assets/images/logo.png" alt="FitGrit Logo" width="40" height="40">
+                        <span>FitGrit</span>
                     </div>
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation">
+                        <span class="hamburger"></span>
+                        <span class="hamburger"></span>
+                        <span class="hamburger"></span>
+                    </button>
                 </div>
                 
-                <!-- User Profile Dropdown -->
-                <div class="user-dropdown">
-                    <button class="user-toggle" id="userToggle" aria-label="User menu">
-                        <div class="user-avatar">
-                            <?php echo htmlspecialchars($userInitials); ?>
+                <!-- Desktop Navigation -->
+                <nav class="header-nav">
+                    <div class="nav-container" id="navContainer">
+                        <?php include 'navigation.php'; ?>
+                    </div>
+                </nav>
+                
+                <!-- Header Right - User Menu -->
+                <div class="header-right">
+                    <!-- Quick Add Button -->
+                    <div class="quick-add-dropdown">
+                        <button class="btn btn-primary btn-small quick-add-toggle" id="quickAddToggle" title="Quick Add">
+                            <span class="plus-icon">+</span>
+                            <span class="btn-text d-none d-md-inline">Add</span>
+                        </button>
+                        
+                        <div class="quick-add-menu" id="quickAddMenu">
+                            <a href="weight.php?quick=true" class="quick-add-item">
+                                <span class="item-icon">⚖️</span>
+                                <span>Log Weight</span>
+                            </a>
+                            <a href="exercise.php?quick=true" class="quick-add-item">
+                                <span class="item-icon">💪</span>
+                                <span>Log Exercise</span>
+                            </a>
+                            <a href="food.php?quick=true" class="quick-add-item">
+                                <span class="item-icon">🍎</span>
+                                <span>Log Food</span>
+                            </a>
+                            <a href="recipes.php?add=true" class="quick-add-item">
+                                <span class="item-icon">📝</span>
+                                <span>Add Recipe</span>
+                            </a>
                         </div>
-                        <span class="user-name d-none d-md-inline">
-                            <?php echo htmlspecialchars($firstName); ?>
-                        </span>
-                        <span class="dropdown-arrow">▼</span>
-                    </button>
+                    </div>
                     
-                    <div class="user-menu" id="userMenu">
-                        <div class="user-info">
-                            <div class="user-avatar-large">
+                    <!-- User Profile Dropdown -->
+                    <div class="user-dropdown">
+                        <button class="user-toggle" id="userToggle" aria-label="User menu">
+                            <div class="user-avatar">
                                 <?php echo htmlspecialchars($userInitials); ?>
                             </div>
-                            <div class="user-details">
-                                <div class="user-full-name">
-                                    <?php echo htmlspecialchars($currentUser['first_name'] . ' ' . $currentUser['last_name']); ?>
+                            <span class="user-name d-none d-lg-inline">
+                                <?php echo htmlspecialchars($firstName); ?>
+                            </span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-info">
+                                <div class="user-avatar-large">
+                                    <?php echo htmlspecialchars($userInitials); ?>
                                 </div>
-                                <div class="user-email">
-                                    <?php echo htmlspecialchars($currentUser['email']); ?>
+                                <div class="user-details">
+                                    <div class="user-full-name">
+                                        <?php echo htmlspecialchars($currentUser['first_name'] . ' ' . $currentUser['last_name']); ?>
+                                    </div>
+                                    <div class="user-email">
+                                        <?php echo htmlspecialchars($currentUser['email']); ?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="user-menu-divider"></div>
-                        
-                        <a href="profile.php" class="user-menu-item">
-                            <span class="menu-icon">👤</span>
-                            <span>Profile Settings</span>
-                        </a>
-                        
-                        <a href="dashboard.php" class="user-menu-item">
-                            <span class="menu-icon">📊</span>
-                            <span>Dashboard</span>
-                        </a>
-                        
-                        <div class="user-menu-divider"></div>
-                        
-                        <div class="user-menu-item app-info">
-                            <span class="menu-icon">📱</span>
-                            <span>App Status</span>
-                            <div class="app-status-indicators">
-                                <span class="status-indicator online" id="connectionStatus" title="Online">🟢</span>
-                                <span class="status-indicator pwa" id="pwaStatus" title="PWA">📱</span>
-                                <span class="status-indicator sync" id="syncStatus" title="Synced">✅</span>
+                            
+                            <div class="user-menu-divider"></div>
+                            
+                            <a href="profile.php" class="user-menu-item">
+                                <span class="menu-icon">👤</span>
+                                <span>Profile Settings</span>
+                            </a>
+                            
+                            <a href="dashboard.php" class="user-menu-item">
+                                <span class="menu-icon">📊</span>
+                                <span>Dashboard</span>
+                            </a>
+                            
+                            <div class="user-menu-divider"></div>
+                            
+                            <div class="user-menu-item app-info">
+                                <span class="menu-icon">📱</span>
+                                <span>App Status</span>
+                                <div class="app-status-indicators">
+                                    <span class="status-indicator online" id="connectionStatus" title="Online">🟢</span>
+                                    <span class="status-indicator pwa" id="pwaStatus" title="PWA">📱</span>
+                                    <span class="status-indicator sync" id="syncStatus" title="Synced">✅</span>
+                                </div>
                             </div>
+                            
+                            <div class="user-menu-divider"></div>
+                            
+                            <a href="logout.php" class="user-menu-item logout">
+                                <span class="menu-icon">🚪</span>
+                                <span>Sign Out</span>
+                            </a>
                         </div>
-                        
-                        <div class="user-menu-divider"></div>
-                        
-                        <a href="logout.php" class="user-menu-item logout">
-                            <span class="menu-icon">🚪</span>
-                            <span>Sign Out</span>
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </header>
+
+    <style>
+        /* Header Layout Fixes */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-shrink: 0;
+        }
+        
+        .header-nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            min-width: 0; /* Allow flex item to shrink */
+        }
+        
+        .nav-container {
+            position: relative;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-shrink: 0;
+        }
+        
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .header-nav {
+                display: none;
+            }
+            
+            .header-right .user-name {
+                display: none;
+            }
+        }
+        
+        /* Tablet adjustments */
+        @media (max-width: 1024px) {
+            .header-content {
+                gap: var(--spacing-sm);
+            }
+            
+            .header-right .btn-text {
+                display: none;
+            }
+        }
+    </style>
 
     <!-- Mobile Navigation Overlay -->
     <div class="mobile-nav" id="mobileNav">

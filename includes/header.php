@@ -132,14 +132,14 @@ if (isset($_SESSION['offline_data_count']) && $_SESSION['offline_data_count'] > 
                     
                     <!-- User Profile Dropdown -->
                     <div class="user-dropdown">
-                        <button class="user-toggle" id="userToggle" aria-label="User menu">
-                            <div class="user-avatar">
+                        <button class="btn btn-primary btn-small user-toggle" id="userToggle" aria-label="User menu" title="User Menu">
+                            <div class="user-avatar-mini">
                                 <?php echo htmlspecialchars($userInitials); ?>
                             </div>
                             <span class="user-name d-none d-lg-inline">
                                 <?php echo htmlspecialchars($firstName); ?>
                             </span>
-                            <span class="dropdown-arrow">▼</span>
+                            <span class="dropdown-arrow d-none d-md-inline">▼</span>
                         </button>
                         
                         <div class="user-menu" id="userMenu">
@@ -560,26 +560,181 @@ if (isset($_SESSION['offline_data_count']) && $_SESSION['offline_data_count'] > 
                 gap: var(--spacing-md);
             }
             
-            .user-avatar, .user-avatar-large {
-                background: var(--primary-orange);
+            /* User Profile Button Styling - Match Quick Add */
+            .user-toggle {
+                /* Reset default button styles */
+                background: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+                cursor: pointer;
+            }
+            
+            .user-toggle.btn {
+                /* Apply consistent button styling */
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+                padding: var(--spacing-sm) var(--spacing-md);
+                background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+                color: var(--white);
+                border-radius: var(--radius-md);
+                font-weight: 500;
+                transition: all var(--transition-normal);
+                box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+                position: relative;
+                overflow: hidden;
+                min-height: 36px;
+            }
+            
+            .user-toggle.btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left var(--transition-slow);
+            }
+            
+            .user-toggle.btn:hover::before {
+                left: 100%;
+            }
+            
+            .user-toggle.btn:hover {
+                background: linear-gradient(135deg, var(--light-orange), var(--primary-orange));
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            }
+            
+            .user-avatar-mini {
+                background: rgba(255, 255, 255, 0.2);
                 color: var(--white);
                 border-radius: 50%;
+                width: 24px;
+                height: 24px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: 600;
-                font-size: 0.9rem;
+                font-size: 0.75rem;
+                border: 1px solid rgba(255, 255, 255, 0.3);
             }
             
-            .user-avatar {
-                width: 32px;
-                height: 32px;
+            .user-name {
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+            
+            .dropdown-arrow {
+                font-size: 0.7rem;
+                opacity: 0.8;
+                transition: transform var(--transition-fast);
+            }
+            
+            .user-toggle.btn:hover .dropdown-arrow {
+                transform: translateY(1px);
+            }
+            
+            /* Consistent dropdown positioning */
+            .quick-add-dropdown, .user-dropdown {
+                position: relative;
+            }
+            
+            /* Make dropdowns consistent */
+            .quick-add-menu, .user-menu {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: var(--light-grey);
+                border: 1px solid var(--primary-orange);
+                border-radius: var(--radius-lg);
+                box-shadow: 0 8px 32px var(--shadow);
+                z-index: 1000;
+                min-width: 200px;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all var(--transition-normal);
+                margin-top: var(--spacing-sm);
+                backdrop-filter: blur(10px);
+            }
+            
+            .quick-add-menu.show, .user-menu.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+            
+            /* Consistent menu item styling */
+            .quick-add-item, .user-menu-item {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+                padding: var(--spacing-md);
+                color: var(--text-light);
+                text-decoration: none;
+                transition: all var(--transition-fast);
+                border-radius: var(--radius-md);
+                margin: var(--spacing-xs);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .quick-add-item::before, .user-menu-item::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.1), transparent);
+                transition: left var(--transition-normal);
+            }
+            
+            .quick-add-item:hover::before, .user-menu-item:hover::before {
+                left: 100%;
+            }
+            
+            .quick-add-item:hover, .user-menu-item:hover {
+                background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+                color: var(--white);
+                transform: translateX(4px);
+            }
+            
+            .quick-add-item:first-child, .user-menu-item:first-child {
+                margin-top: var(--spacing-sm);
+            }
+            
+            .quick-add-item:last-child, .user-menu-item:last-child {
+                margin-bottom: var(--spacing-sm);
+            }
+            
+            /* Enhanced user info section */
+            .user-info {
+                padding: var(--spacing-lg);
+                border-bottom: 1px solid var(--border-grey);
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-md);
+                background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 138, 91, 0.1));
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
             }
             
             .user-avatar-large {
+                background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+                color: var(--white);
+                border-radius: 50%;
                 width: 48px;
                 height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
                 font-size: 1.1rem;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
             }
             
             .user-details {
@@ -590,25 +745,35 @@ if (isset($_SESSION['offline_data_count']) && $_SESSION['offline_data_count'] > 
                 font-weight: 600;
                 color: var(--text-light);
                 margin-bottom: var(--spacing-xs);
+                font-size: 1.1rem;
             }
             
             .user-email {
                 font-size: 0.85rem;
-                color: #999;
+                color: var(--primary-orange);
+                opacity: 0.8;
             }
             
             .user-menu-divider {
                 height: 1px;
-                background: var(--border-grey);
+                background: linear-gradient(90deg, transparent, var(--primary-orange), transparent);
                 margin: var(--spacing-xs) var(--spacing-md);
+                opacity: 0.3;
             }
             
             .app-info {
                 cursor: default;
+                background: rgba(255, 107, 53, 0.05) !important;
             }
             
             .app-info:hover {
-                background: transparent !important;
+                background: rgba(255, 107, 53, 0.05) !important;
+                transform: none !important;
+                color: var(--text-light) !important;
+            }
+            
+            .app-info::before {
+                display: none !important;
             }
             
             .app-status-indicators {
@@ -619,15 +784,27 @@ if (isset($_SESSION['offline_data_count']) && $_SESSION['offline_data_count'] > 
             
             .status-indicator {
                 font-size: 0.8rem;
+                padding: 2px 4px;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.1);
             }
             
             .logout {
                 color: var(--accent-red) !important;
+                border: 1px solid rgba(220, 20, 60, 0.3);
             }
             
             .logout:hover {
-                background: rgba(220, 20, 60, 0.1) !important;
-                color: var(--accent-red) !important;
+                background: linear-gradient(135deg, var(--accent-red), #B8122A) !important;
+                color: var(--white) !important;
+                border-color: var(--accent-red);
+            }
+            
+            .item-icon, .menu-icon {
+                font-size: 1.2rem;
+                min-width: 24px;
+                text-align: center;
+                filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
             }
             
             /* Mobile Navigation Styles */
